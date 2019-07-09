@@ -33,6 +33,13 @@ class Exchanger(ttk.Frame):
         frInCurrency = ttk.Frame(self)
         frInCurrency.pack_propagate(0)
 
+        frErrorMessages = ttk.Frame(self, height = 40)
+        frErrorMessages.pack(side = BOTTOM, fill=X)#lo empaquetamos abajo i que expanda por el eje x ocupando todo el espacio
+        frErrorMessages.pack_propagate(0)#para que mande mas que sus hijos
+        self.lblErrorMessages = ttk.Label(frErrorMessages, text='Texto de preba',width = 50 foreground ='red', anchor=CENTER)
+        self.lblErrorMessages.pack(side=TOP, fill=BOTH, expand=True )
+
+
         lblQ = ttk.Label(frInCurrency, text='Cantidad')
         lblQ.pack(side=TOP, fill=X, padx=DEFAULPADDING, pady=DEFAULPADDING)
 
@@ -50,6 +57,8 @@ class Exchanger(ttk.Frame):
 
         frOutCurrency.pack(side = LEFT, fill=BOTH, expand = True)
 
+        
+
         lblQ=ttk.Label(frOutCurrency, text='Cantidad')
         lblQ.pack (side=TOP, fill=X, padx=DEFAULPADDING, pady=DEFAULPADDING)
 
@@ -62,10 +71,61 @@ class Exchanger(ttk.Frame):
 
         frOutCurrency.pack(side=LEFT, fill=BOTH, expand=True)
 
+    def ValidarCantidad(self, *args):
+        try:
+            v=float(self.strInQunatity.get())
+            self.oldInQuantity =v
+            self.convertirDivisas()
+        except:
+            self.str
+
     def convertirDivisas(self,*args):
         print('in', self.strInCurrency.get())
         print('out', self.strOutCurrency.get())
         print('cantidad', self.strInQunatity.get())
+
+        base= 'EUR'
+        _from=self.strInCurrency.get()
+        #para coger solo las siglas de la moneda seleccionada
+        _from = _from[:3]
+        _to=self.strOutCurrency.get()
+        _to = _to[:3]
+        symbols= _from + ',' +_to
+        self.strInCurrency.get()
+        if self.strInCurrency.get() and self.strInQunatity.get() and self.strOutCurrency.get():
+
+            self.lblErrorMessages.confi(text='Conectando...')
+
+            response = requests.get(self.all_symbols_ep.format(self.api_key, base,symbols))
+            
+            if response.status_code == 200:
+                data = json.loads(response.text)
+                if data['success']:
+                    tasa_conversion = data['rates'][_from]
+                    tasa_conversion = data['rates'][_top]
+                    self.lblErrorMessages.config(text='')
+                else:
+                    msgError= '{} - {}'.format(data['error']['code'], data['error']['type'])
+                    print(msgError)
+
+                    self.lblErrorMessages.config(text=msgError)#para pintar el mensaje en la label
+                    return
+
+            else:
+                msgError = 'Se ha producido un error en la consulta API:'+response.status_code
+                print(msgError)
+
+                self.lblErrorMessages.config(text=msgError)#para pintar el mensaje en la label
+                return
+
+                
+            
+            #valor_label = Cantidad / tasa_conversion * tasa_conversion2
+
+            valor_label = round(float(self.strInQunatity.get())/ tasa_conversion * tasa_conversion2, 5)
+            #para modificar los atributos de una label que ya esta creada, se usa el config)
+            self.outQuantityLbl.config(text=valor_label)
+
 
     def getCurrencies(self):
         response = requests.get(self.all_symbols_ep.format(self.api_key))
@@ -78,7 +138,12 @@ class Exchanger(ttk.Frame):
                 result.append(text)
             return result
         else:
-            print('se ha producido un error al consutar symbols:', response.status_code)
+            msgError = 'Se ha producido un error en la consulta API:'+response.status_code
+            print(msgError)
+
+            self.lblErrorMessages.config(text=msgError)#para pintar el mensaje en la label
+            return
+
 
 class MainApp(Tk):
     def __init__(self):
