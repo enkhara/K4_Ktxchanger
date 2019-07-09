@@ -53,11 +53,11 @@ class Exchanger(ttk.Frame):
         lblQ=ttk.Label(frOutCurrency, text='Cantidad')
         lblQ.pack (side=TOP, fill=X, padx=DEFAULPADDING, pady=DEFAULPADDING)
 
-        self.outQuantityLbl = ttk.Label(frOutCurrency, font=('Helvetica', 26), anchor=E, width=10)
+        self.outQuantityLbl = ttk.Label(frOutCurrency, font=('Helvetica', 24), anchor=E, width=10)
         self.outQuantityLbl.pack(side=TOP, fill=X,padx=DEFAULPADDING, pady=DEFAULPADDING)
 
         self.outCurrencyCombo = ttk.Combobox(frOutCurrency, width=25, height=5, values=currencies, textvariable=self.strOutCurrency)
-        self.outCurrencyCombo.pack(side=TOP, fill= X, padx=DEFAULPADDING, pady=DEFAULPADDING, ipady=2)
+        self.outCurrencyCombo.pack(side=TOP, fill= X, padx=DEFAULPADDING, pady=DEFAULPADDING,  ipady=2)
         self.outCurrencyCombo.bind('<<ComboboxSelected>>', self.convertirDivisas)
 
         frOutCurrency.pack(side=LEFT, fill=BOTH, expand=True)
@@ -74,7 +74,7 @@ class Exchanger(ttk.Frame):
             currencies = json.loads(response.text)#usamos json para formatear el arichivo
             result=[] #creamos la lista vacía
             for symbol in currencies['symbols']:
-                text = " {} - {} ".format(symbol, currencies['symbols']['symbol'])
+                text = " {} - {} ".format(symbol, currencies['symbols'][symbol])
                 result.append(text)
             return result
         else:
