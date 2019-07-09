@@ -23,7 +23,8 @@ class Exchanger(ttk.Frame):
 
         #variables de control
         self.strInQunatity= StringVar(value='')
-        self.strinQunatity.trace('w', self.convertirDivisas)#w - cada vez que lo modificamos
+        self.strInQunatity.trace('w', self.convertirDivisas)#w - cada vez que lo modificamos
+        
         self.strInCurrency =StringVar()
         self.strOutCurrency = StringVar()
 
@@ -40,7 +41,7 @@ class Exchanger(ttk.Frame):
         #textvariable es la variable que se selecciona, combobox es un desplegable
         self.inCurrencyCombo = ttk.Combobox(frInCurrency, width = 25, height =5, values=currencies, textvariable=self.strInCurrency) 
         self.inCurrencyCombo.pack(side=TOP, fill=X, padx=DEFAULPADDING, pady=DEFAULPADDING)
-        self.inCurrencyCombo.bind('<<ComboboxSelected>>', self.convertiDivisas)
+        self.inCurrencyCombo.bind('<<ComboboxSelected>>', self.convertirDivisas)
 
         frInCurrency.pack(side=LEFT, fill=BOTH, expand = True)
 
@@ -52,12 +53,12 @@ class Exchanger(ttk.Frame):
         lblQ=ttk.Label(frOutCurrency, text='Cantidad')
         lblQ.pack (side=TOP, fill=X, padx=DEFAULPADDING, pady=DEFAULPADDING)
 
-        self.outQuantityLbl = ttk.Label(frOutCurrency, font=('Helvetica', 24), anchor=E, width=10)
-        self.outQuantityLbl.pack(side=TOP, fill=X)
+        self.outQuantityLbl = ttk.Label(frOutCurrency, font=('Helvetica', 26), anchor=E, width=10)
+        self.outQuantityLbl.pack(side=TOP, fill=X,padx=DEFAULPADDING, pady=DEFAULPADDING)
 
         self.outCurrencyCombo = ttk.Combobox(frOutCurrency, width=25, height=5, values=currencies, textvariable=self.strOutCurrency)
         self.outCurrencyCombo.pack(side=TOP, fill= X, padx=DEFAULPADDING, pady=DEFAULPADDING, ipady=2)
-        self.outCurrencyCombo.bind('<<ComboboxSelected>>', self.convertiDivisas)
+        self.outCurrencyCombo.bind('<<ComboboxSelected>>', self.convertirDivisas)
 
         frOutCurrency.pack(side=LEFT, fill=BOTH, expand=True)
 
@@ -70,10 +71,10 @@ class Exchanger(ttk.Frame):
         response = requests.get(self.all_symbols_ep.format(self.api_key))
 
         if response.status_code == 200:
-            currencies = json.loads(response.text)
-            result=[]
+            currencies = json.loads(response.text)#usamos json para formatear el arichivo
+            result=[] #creamos la lista vacía
             for symbol in currencies['symbols']:
-                text= '{} - {}'.format(symbol, currencies['symbols'], ['symbol'])
+                text = " {} - {} ".format(symbol, currencies['symbols']['symbol'])
                 result.append(text)
             return result
         else:
